@@ -18,5 +18,5 @@ public class RootCommand {
     @Command(aliases = { "ancientbook", "abook" }, desc = "AncientBook main command")
     @CommandPermissions("ancientbook.command")
     @NestedCommand({ AncientBookCommands.class })
-    public void gToolsCommand(CommandContext args, CommandSender sender) { }
+    public void ancientBook(CommandContext args, CommandSender sender) { }
 }
