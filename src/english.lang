@@ -1,0 +1,22 @@
+# AncientBook translation file
+
+utils.no-player: &cNo player with name $1
+utils.no-world: &cWorld $1 not loaded
+utils.cs-not-player: &cThis command can be executed only by a player
+
+reload.ok: &aConfiguration reloaded
+reload.error: &cThere was a error reloading config, see server console
+
+add.not-a-book: &cYou must hold a written book to create book template
+add.no-author: &cPlease, specify author or use signed book
+add.no-title: &cPlease, specify title or use signed book
+add.illegal-params: &cIllegal parameters!
+add.data-too-low: &cBook data $1 is too low, min: &2$2&c for template books
+add.added: &2Book template &6$1&2 added
+add.replaced: &2Book template &6$1&2 replaced
+
+list.header: &3== Book templates (&5$1&3): ==
+list.entry: &6$1&f: $2
+
+give.no-such: &cThere is no book template with data &f$1
+give.not-fit: &5You do not have enough space in you inventory, so book has dropped nearby

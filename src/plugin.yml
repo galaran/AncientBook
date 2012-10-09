@@ -1,0 +1,14 @@
+name: AncientBook
+main: mccity.plugins.ancientbook.AncientBookPlugin
+version: 1.0
+description: Predefined books manager
+author: Galaran
+
+commands:
+    ancientbook:
+        description: AncientBook main command
+        aliases: [abook]
+
+permissions:
+    ancientbook.command:
+        default: op

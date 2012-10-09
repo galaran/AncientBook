@@ -1,0 +1,36 @@
+<project name="AncientBook" basedir=".">
+
+    <property name="jar.name" value="AncientBook.jar"/>
+    <property name="utils.suffix" value="ancientbook"/>
+
+    <property name="plugins.dir" value="C:/Users/Galaran/Desktop/McServer/plugins"/>
+    <property name="utils.srcroot" value="F:/Dropbox/Java/idea_prj/Bukkit/GalaranUtils/src"/>
+    <property name="utils.package" value="me/galaran/bukkitutils"/>
+    <property name="utils.placeholder" value="$_utils_project_name_$"/>
+
+    <target name="copy-plugin">
+        <copy todir="${plugins.dir}" overwrite="true">
+            <fileset file="${jar.name}"/>
+        </copy>
+    </target>
+
+    <target name="update-utils">
+        <delete dir="src/${utils.package}"/>
+        <mkdir dir="src/${utils.package}"/>
+        <mkdir dir="src/${utils.package}/${utils.suffix}"/>
+        <copy todir="src/${utils.package}/${utils.suffix}">
+            <fileset dir="${utils.srcroot}/${utils.package}/${utils.placeholder}">
+                <include name="GUtils.java"/>
+                <include name="StringUtils.java"/>
+                <include name="Lang.java"/>
+                <include name="DoOrNotify.java"/>
+                <include name="ToStringer.java"/>
+                <include name="CbUtils.java"/>
+                <include name="Book.java"/>
+                <include name="YamlUtils.java"/>
+            </fileset>
+        </copy>
+        <replace dir="src/${utils.package}/${utils.suffix}" token="${utils.placeholder}" value="${utils.suffix}"/>
+    </target>
+
+</project>

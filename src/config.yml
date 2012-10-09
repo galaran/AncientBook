@@ -1,0 +1,6 @@
+# AncientBook configuration file
+
+lang: mccity
+
+# Min data for template books
+start-data: 1024
