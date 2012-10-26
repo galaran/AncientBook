@@ -74,7 +74,7 @@ public class StringUtils {
         return String.format(Locale.US, "%." + decimalPlaces + "f", val);
     }
 
-    private static final int KEY_EXPECTED = 0;
+    private static final int KEY = 0;
     private static final int VALUE_START = 1;
     private static final int VALUE_CONTINUE = 2;
 
@@ -82,27 +82,32 @@ public class StringUtils {
     public static Map<String, String> parseParameters(String[] args) throws IllegalArgumentException {
         Map<String, String> result = new LinkedHashMap<String, String>();
 
-        int state = KEY_EXPECTED;
+        int expectedState = KEY;
         String currentKey = null;
         StringBuilder currentValue = null;
         for (String arg : args) {
-            switch (state) {
-            case KEY_EXPECTED:
+            switch (expectedState) {
+            case KEY:
                 if (arg.charAt(0) == '-') {
                     currentKey = arg.substring(1);
                 } else {
                     throw new IllegalArgumentException("Parameter key expected");
                 }
-                state = VALUE_START;
+                expectedState = VALUE_START;
                 break;
             case VALUE_START:
                 if (arg.charAt(0) == '"') {
-                    currentValue = new StringBuilder();
-                    currentValue.append(arg.substring(1));
-                    state = VALUE_CONTINUE;
+                    if (arg.charAt(arg.length() - 1) == '"') {
+                        result.put(currentKey, arg.substring(1, arg.length() - 1));
+                        expectedState = KEY;
+                    } else {
+                        currentValue = new StringBuilder();
+                        currentValue.append(arg.substring(1));
+                        expectedState = VALUE_CONTINUE;
+                    }
                 } else {
                     result.put(currentKey, arg);
-                    state = KEY_EXPECTED;
+                    expectedState = KEY;
                 }
                 break;
             case VALUE_CONTINUE:
@@ -110,16 +115,16 @@ public class StringUtils {
                 if (arg.charAt(arg.length() - 1) == '"') {
                     currentValue.append(arg.substring(0, arg.length() - 1));
                     result.put(currentKey, currentValue.toString());
-                    state = KEY_EXPECTED;
+                    expectedState = KEY;
                 } else {
                     currentValue.append(arg);
-                    state = VALUE_CONTINUE;
+                    expectedState = VALUE_CONTINUE;
                 }
                 break;
             }
         }
 
-        if (state != KEY_EXPECTED) throw new IllegalArgumentException("Illegal end");
+        if (expectedState != KEY) throw new IllegalArgumentException("Illegal end");
         return result;
     }
 
@@ -129,5 +134,27 @@ public class StringUtils {
         String[] args = string.trim().isEmpty() ? new String[0] : string.trim().split("\\s+");
 
         return parseParameters(args);
+    }
+
+    public static boolean stringContainsIgnoreCaseAndColor(String line, String matchingString) {
+        String lineRaw = ChatColor.stripColor(colorizeAmps(line)).trim().toLowerCase();
+        String matchingStringRaw = ChatColor.stripColor(matchingString).trim().toLowerCase();
+        return lineRaw.contains(matchingStringRaw);
+    }
+
+    /** Parameterize + colorize */
+    public static String decorateString(String string, Object... params) {
+        return colorizeAmps(parameterizeString(string, params));
+    }
+
+    public static String surroundString(String before, String text, String after, ChatColor surrColor, ChatColor textColor) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(surrColor);
+        sb.append(before);
+        sb.append(textColor);
+        sb.append(text);
+        sb.append(surrColor);
+        sb.append(after);
+        return sb.toString();
     }
 }

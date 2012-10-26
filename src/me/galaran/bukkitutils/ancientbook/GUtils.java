@@ -17,16 +17,21 @@ import java.util.logging.Logger;
 
 public class GUtils {
 
-    private static Logger log;
-    private static String chatPrefix = ChatColor.RED + "NO_PREFIX " + ChatColor.WHITE;
     private static final String ENABLELD = ChatColor.DARK_GREEN + "enabled";
     private static final String DISABLED = ChatColor.DARK_RED + "disabled";
+
+    private static Logger log;
+    private static String chatPrefix;
 
     public static final Random random = new Random();
 
     public static void init(Logger logger, String chatPrefixx) {
         log = logger;
-        chatPrefix = ChatColor.GRAY + "[" + chatPrefixx + "] " + ChatColor.WHITE;
+        chatPrefix = StringUtils.surroundString("[", chatPrefixx, "] ", ChatColor.GRAY, ChatColor.DARK_PURPLE) + ChatColor.GRAY;
+    }
+
+    public static String enabledDisabled(boolean state) {
+        return state ? ENABLELD : DISABLED;
     }
 
     public static void setBlockMatData(Block block, MaterialData matData, boolean applyPhysics) {
@@ -85,12 +90,12 @@ public class GUtils {
         return String.format(Locale.US, "%s, pitch: %.2f, yaw: %.2f", locToStringWorldXYZ(loc), loc.getPitch(), loc.getYaw());
     }
 
-    public static String locToStringXYZ(Location loc) {
-        return String.format(Locale.US, "[%.2f %.2f %.2f]", loc.getX(), loc.getY(), loc.getZ());
-    }
-
     public static String locToStringWorldXYZ(Location loc) {
         return loc.getWorld().getName() + ": " + locToStringXYZ(loc);
+    }
+
+    public static String locToStringXYZ(Location loc) {
+        return String.format(Locale.US, "[%.2f %.2f %.2f]", loc.getX(), loc.getY(), loc.getZ());
     }
 
     public static String stackToString(ItemStack stack) {
@@ -147,13 +152,8 @@ public class GUtils {
         log(Level.INFO, message, params);
     }
 
-    /** Parameterized + colorized */
-    public static String getProcessed(String string, Object... params) {
-        return StringUtils.colorizeAmps(StringUtils.parameterizeString(string, params));
-    }
-
     public static void sendMessage(CommandSender p, String message, Object... params) {
-        String finalString = getProcessed(message, params);
+        String finalString = StringUtils.decorateString(message, params);
         if (!finalString.equals("$suppress")) {
             p.sendMessage(chatPrefix + finalString);
         }
@@ -166,8 +166,8 @@ public class GUtils {
         }
     }
 
-    public static String getProcessedTranslation(String key, Object... params) {
-        return getProcessed(Lang.getTranslation(key), params);
+    public static String getDecoratedTranslation(String key, Object... params) {
+        return StringUtils.decorateString(Lang.getTranslation(key), params);
     }
 
     public static void sendTranslated(CommandSender p, String key, Object... params) {
@@ -194,15 +194,5 @@ public class GUtils {
                 sendMessage(curPlayer, rawMessage);
             }
         }
-    }
-
-    public static String enabledDisabled(boolean state) {
-        return state ? ENABLELD : DISABLED;
-    }
-
-    public static boolean stringContainsIgnoreCaseAndColor(String line, String matchingString) {
-        String lineRaw = ChatColor.stripColor(StringUtils.colorizeAmps(line)).trim().toLowerCase();
-        String matchingStringRaw = ChatColor.stripColor(matchingString).trim().toLowerCase();
-        return lineRaw.contains(matchingStringRaw);
     }
 }
