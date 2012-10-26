@@ -20,3 +20,6 @@ list.entry: &6$1&f: $2
 
 give.no-such: &cThere is no book template with data &f$1
 give.not-fit: &5You do not have enough space in you inventory, so book has dropped nearby
+
+unsign.not-written-book: &cHold a written book to unsign it
+unsign.success: &aBook &5"$1"&a unsigned

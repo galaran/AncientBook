@@ -31,6 +31,22 @@ public class AncientBookCommands {
         }
     }
 
+    @Command(aliases = { "unsign" }, desc = "Unsign written book in the hand", min = 0, max = 0)
+    @CommandPermissions("ancientbook.command")
+    public void unsignHandBook(CommandContext args, CommandSender sender) {
+        if (!DoOrNotify.isPlayer(sender)) return;
+        Player player = (Player) sender;
+
+        ItemStack handStack = player.getItemInHand();
+        if (handStack != null && handStack.getType() == Material.WRITTEN_BOOK) {
+            Book book = new Book(handStack);
+            player.setItemInHand(book.toUnsignedBook());
+            GUtils.sendTranslated(player, "unsign.success", book.getTitle());
+        } else {
+            GUtils.sendTranslated(player, "unsign.not-written-book");
+        }
+    }
+
     @Command(aliases = { "add" }, desc = "Add or replace book template with specified data",
             usage = "[-d book_data] [-a \"author\"] [-t \"title\"]", min = 0, max = -1)
     @CommandPermissions("ancientbook.command")
