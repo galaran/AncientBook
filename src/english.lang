@@ -15,10 +15,12 @@ add.data-too-low: &cBook data $1 is too low, min: &2$2&c for template books
 add.added: &2Book template &6$1&2 added
 add.replaced: &2Book template &6$1&2 replaced
 
+remove.ok: &fBook template &5"$1"&f removed (data: &4$2&f)
+book.no-such: &cThere is no book template with data &f$1
+
 list.header: &3== Book templates (&5$1&3): ==
 list.entry: &6$1&f: $2
 
-give.no-such: &cThere is no book template with data &f$1
 give.not-fit: &5You do not have enough space in you inventory, so book has dropped nearby
 
 unsign.not-written-book: &cHold a written book to unsign it

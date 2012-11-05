@@ -101,6 +101,14 @@ public class AncientBookCommands {
         plugin.getBooksManager().addBook(data, new Book(title, author, pages), sender);
     }
 
+    @Command(aliases = { "remove", "rm" }, desc = "Remove book with given data",
+            usage = "<book_data>", min = 1, max = 1)
+    @CommandPermissions("ancientbook.command")
+    public void removeBook(CommandContext args, CommandSender sender) {
+        short bookData = Short.parseShort(args.getString(0));
+        plugin.getBooksManager().removeBook(bookData, sender);
+    }
+
     @Command(aliases = { "list" }, desc = "Book templates list", min = 0, max = 0)
     @CommandPermissions("ancientbook.command")
     public void listBooks(CommandContext args, CommandSender sender) {
@@ -121,7 +129,7 @@ public class AncientBookCommands {
         short data = (short) args.getInteger(0);
         Book book = plugin.getBooksManager().getBook(data);
         if (book == null) {
-            GUtils.sendTranslated(sender, "give.no-such", data);
+            GUtils.sendTranslated(sender, "book.no-such", data);
             return;
         }
 

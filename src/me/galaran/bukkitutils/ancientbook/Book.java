@@ -46,16 +46,24 @@ public class Book implements ConfigurationSerializable {
         return this.author;
     }
 
-    public void setAuthor(String sAuthor) {
-        this.author = sAuthor;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getTitle() {
         return this.title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String[] getPages() {
         return this.pages;
+    }
+
+    public void setPages(String[] pages) {
+        this.pages = pages;
     }
 
     public ItemStack toSignedBook(int amount) {
@@ -71,11 +79,9 @@ public class Book implements ConfigurationSerializable {
         for (String page : pages) {
             nPages.add(new NBTTagString(page, page));
         }
-
         newBookNBT.set("pages", nPages);
 
         newbook.getHandle().tag = newBookNBT;
-
         return newbook;
     }
 
@@ -93,11 +99,9 @@ public class Book implements ConfigurationSerializable {
         for (String page : pages) {
             nPages.add(new NBTTagString(page, page));
         }
-
         newBookNBT.set("pages", nPages);
 
         newbook.getHandle().tag = newBookNBT;
-
         return newbook;
     }
 

@@ -28,12 +28,28 @@ public class BooksManager {
             return;
         }
 
+        // fix encoding
+        String[] pages = book.getPages();
+        for (int i = 0; i < pages.length; i++) {
+            pages[i] = Settings.fixEncoding(pages[i]);
+        }
+
         if (bookTemplates.put(data, book) != null) {
             GUtils.sendTranslated(sender, "add.replaced", data);
         } else {
             GUtils.sendTranslated(sender, "add.added", data);
         }
         saveBooks();
+    }
+
+    public void removeBook(short data, CommandSender sender) {
+        Book removed = bookTemplates.remove(data);
+        if (removed != null) {
+            GUtils.sendTranslated(sender, "remove.ok", removed.getTitle(), data);
+            saveBooks();
+        } else {
+            GUtils.sendTranslated(sender, "book.no-such", data);
+        }
     }
 
     public Book getBook(short data) {
