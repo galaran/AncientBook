@@ -29,6 +29,8 @@ public class BooksManager {
         }
 
         // fix encoding
+        book.setAuthor(Settings.fixEncoding(book.getAuthor()));
+        book.setTitle(Settings.fixEncoding(book.getTitle()));
         String[] pages = book.getPages();
         for (int i = 0; i < pages.length; i++) {
             pages[i] = Settings.fixEncoding(pages[i]);
