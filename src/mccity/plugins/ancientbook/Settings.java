@@ -15,6 +15,8 @@ public class Settings {
     private static String wrongSymbols;
     private static String rightSymbols;
 
+    public static boolean isConvertBookWorm;
+
     public static void load(File configFile) throws RuntimeException {
         FileConfiguration root = YamlConfiguration.loadConfiguration(configFile);
 
@@ -30,6 +32,8 @@ public class Settings {
                 throw new IllegalArgumentException("Encoding strings must the same length");
             }
         }
+
+        isConvertBookWorm = root.getBoolean("convert-bookworm", true);
     }
 
     public static String fixEncoding(String string) {

@@ -80,6 +80,7 @@ public class BooksManager {
             for (String key : keys) {
                 bookTemplates.put(Short.parseShort(key), new Book(root.getConfigurationSection(key)));
             }
+            GUtils.log(bookTemplates.size() + " book templates");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
