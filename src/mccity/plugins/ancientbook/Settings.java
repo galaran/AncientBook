@@ -9,20 +9,18 @@ public class Settings {
 
     public static String lang;
 
-    public static int startData;
+    public static int minData;
 
     private static boolean isFixEncoding;
     private static String wrongSymbols;
     private static String rightSymbols;
-
-    public static boolean isConvertBookWorm;
 
     public static void load(File configFile) throws RuntimeException {
         FileConfiguration root = YamlConfiguration.loadConfiguration(configFile);
 
         lang = root.getString("lang", "english");
 
-        startData = root.getInt("start-data", 1024);
+        minData = root.getInt("min-data", 1024);
 
         isFixEncoding = root.getBoolean("fix-encoding", true);
         wrongSymbols = root.getString("wrong-symbols");
@@ -32,8 +30,6 @@ public class Settings {
                 throw new IllegalArgumentException("Encoding strings must the same length");
             }
         }
-
-        isConvertBookWorm = root.getBoolean("convert-bookworm", true);
     }
 
     public static String fixEncoding(String string) {

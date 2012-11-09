@@ -23,8 +23,8 @@ public class BooksManager {
     }
 
     public void addBook(short data, Book book, CommandSender sender) {
-        if (data < Settings.startData) {
-            GUtils.sendTranslated(sender, "add.data-too-low", data, Settings.startData);
+        if (data < Settings.minData) {
+            GUtils.sendTranslated(sender, "add.data-too-low", data, Settings.minData);
             return;
         }
 
@@ -80,7 +80,7 @@ public class BooksManager {
             for (String key : keys) {
                 bookTemplates.put(Short.parseShort(key), new Book(root.getConfigurationSection(key)));
             }
-            GUtils.log(bookTemplates.size() + " book templates");
+            GUtils.log(bookTemplates.size() + " book templates loaded");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();

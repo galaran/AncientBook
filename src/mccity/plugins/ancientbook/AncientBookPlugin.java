@@ -1,7 +1,6 @@
 package mccity.plugins.ancientbook;
 
 import com.sk89q.minecraft.util.commands.ancientbook.*;
-import mccity.plugins.ancientbook.bookworm.WormBooksConverter;
 import mccity.plugins.ancientbook.commands.AncientBookCommands;
 import mccity.plugins.ancientbook.commands.RootCommand;
 import me.galaran.bukkitutils.ancientbook.GUtils;
@@ -18,20 +17,13 @@ public class AncientBookPlugin extends JavaPlugin {
     private CommandsManager<CommandSender> commands;
     private BooksManager booksManager;
 
-    private WormBooksConverter wbConverter;
-
     @Override
     public void onEnable() {
         GUtils.init(getLogger(), "AncientBook");
 
         booksManager = new BooksManager(getDataFolder());
-        wbConverter = new WormBooksConverter(getDataFolder());
 
         reloadSettings();
-
-        if (Settings.isConvertBookWorm) {
-            getServer().getPluginManager().registerEvents(wbConverter, this);
-        }
 
         commands = new CommandsManager<CommandSender>() {
             @Override
@@ -58,13 +50,7 @@ public class AncientBookPlugin extends JavaPlugin {
             return false;
         }
 
-        boolean success = booksManager.reloadBooks();
-
-        if (Settings.isConvertBookWorm) {
-            success = success && wbConverter.reloadBooks();
-        }
-
-        return success;
+        return booksManager.reloadBooks();
     }
 
     public BooksManager getBooksManager() {

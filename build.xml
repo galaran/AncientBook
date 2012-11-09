@@ -28,8 +28,6 @@
                 <include name="CbUtils.java"/>
                 <include name="Book.java"/>
                 <include name="YamlUtils.java"/>
-                <include name="UnicodeBOMInputStream.java"/>
-                <include name="WordWrapper.java"/>
             </fileset>
         </copy>
         <replace dir="src/${utils.package}/${utils.suffix}" token="${utils.placeholder}" value="${utils.suffix}"/>

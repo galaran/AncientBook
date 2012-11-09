@@ -47,7 +47,7 @@ public class AncientBookCommands {
         }
     }
 
-    @Command(aliases = { "add" }, desc = "Add or replace book template with specified data",
+    @Command(aliases = { "save", "add" }, desc = "Add or replace book template with specified data",
             usage = "[-d book_data] [-a \"author\"] [-t \"title\"]", min = 0, max = -1)
     @CommandPermissions("ancientbook.command")
     public void addBook(CommandContext args, CommandSender sender) {

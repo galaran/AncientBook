@@ -1,7 +1,7 @@
 name: AncientBook
 main: mccity.plugins.ancientbook.AncientBookPlugin
-version: 1.5
-description: Predefined books manager and BookWorm to 1.3 converter
+version: 1.6
+description: Predefined books manager
 author: Galaran
 
 commands:
