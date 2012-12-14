@@ -1,8 +1,13 @@
 # AncientBook translation file
 
-utils.no-player: &cNo player with name $1
+utils.no-player: &cNo player with name &3$1
+utils.no-player-matching: &cNo player with name matching &3$1
 utils.no-world: &cWorld $1 not loaded
 utils.cs-not-player: &cThis command can be executed only by a player
+utils.no-perm: &cYou don't have permission
+
+command.not-a-number: &cNumber expected, string received instead.
+command.error-console: &cAn error has occurred. See server console.
 
 reload.ok: &aConfiguration reloaded
 reload.error: &cThere was a error reloading config, see server console

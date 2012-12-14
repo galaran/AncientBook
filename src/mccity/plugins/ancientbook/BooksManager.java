@@ -1,8 +1,8 @@
 package mccity.plugins.ancientbook;
 
-import me.galaran.bukkitutils.ancientbook.Book;
-import me.galaran.bukkitutils.ancientbook.GUtils;
-import me.galaran.bukkitutils.ancientbook.YamlUtils;
+import me.galaran.bukkitutils.ancientbook.IOUtils;
+import me.galaran.bukkitutils.ancientbook.nms.Book;
+import me.galaran.bukkitutils.ancientbook.text.Messaging;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -24,7 +24,7 @@ public class BooksManager {
 
     public void addBook(short data, Book book, CommandSender sender) {
         if (data < Settings.minData) {
-            GUtils.sendTranslated(sender, "add.data-too-low", data, Settings.minData);
+            Messaging.send(sender, "add.data-too-low", data, Settings.minData);
             return;
         }
 
@@ -37,9 +37,9 @@ public class BooksManager {
         }
 
         if (bookTemplates.put(data, book) != null) {
-            GUtils.sendTranslated(sender, "add.replaced", data);
+            Messaging.send(sender, "add.replaced", data);
         } else {
-            GUtils.sendTranslated(sender, "add.added", data);
+            Messaging.send(sender, "add.added", data);
         }
         saveBooks();
     }
@@ -47,10 +47,10 @@ public class BooksManager {
     public void removeBook(short data, CommandSender sender) {
         Book removed = bookTemplates.remove(data);
         if (removed != null) {
-            GUtils.sendTranslated(sender, "remove.ok", removed.getTitle(), data);
+            Messaging.send(sender, "remove.ok", removed.getTitle(), data);
             saveBooks();
         } else {
-            GUtils.sendTranslated(sender, "book.no-such", data);
+            Messaging.send(sender, "book.no-such", data);
         }
     }
 
@@ -67,20 +67,20 @@ public class BooksManager {
         for (Map.Entry<Short, Book> entry : bookTemplates.entrySet()) {
             root.set(String.valueOf(entry.getKey()), entry.getValue().serialize());
         }
-        YamlUtils.saveYml(root, booksFile);
+        IOUtils.saveYml(root, booksFile);
     }
 
     public boolean reloadBooks() {
         bookTemplates.clear();
 
-        YamlUtils.createFileIfNotExists(booksFile);
+        IOUtils.createFileIfNotExists(booksFile);
         YamlConfiguration root = YamlConfiguration.loadConfiguration(booksFile);
         try {
             Set<String> keys = root.getKeys(false);
             for (String key : keys) {
                 bookTemplates.put(Short.parseShort(key), new Book(root.getConfigurationSection(key)));
             }
-            GUtils.log(bookTemplates.size() + " book templates loaded");
+            Messaging.log(bookTemplates.size() + " book templates loaded");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();

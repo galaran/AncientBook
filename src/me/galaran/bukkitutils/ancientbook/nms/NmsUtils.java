@@ -1,4 +1,4 @@
-package me.galaran.bukkitutils.ancientbook;
+package me.galaran.bukkitutils.ancientbook.nms;
 
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -8,14 +8,16 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class CbUtils {
+public class NmsUtils {
 
     /** Bukkit's World.dropItem() drops stack with null NBT tag, this method not */
     public static void dropStackSafe(ItemStack stack, Location loc) {
         net.minecraft.server.World nmsWorld = ((CraftWorld) loc.getWorld()).getHandle();
-        net.minecraft.server.ItemStack nmsStack = ((CraftItemStack) stack.clone()).getHandle();
+        net.minecraft.server.ItemStack nmsStack = CraftItemStack.createNMSItemStack(stack);
 
         net.minecraft.server.EntityItem entity =
                 new net.minecraft.server.EntityItem(nmsWorld, loc.getX(), loc.getY(), loc.getZ(), nmsStack);
@@ -24,27 +26,27 @@ public class CbUtils {
     }
 
     /**
-     * Gives deep clone of stacks, and drop ungiven, if not fit to inventory
-     * @return is there was no enought inventory space and some stacks dropped
+     * Gives stacks to player
+     * @return all stacks fit
      */
     @SuppressWarnings("deprecation")
-    public static boolean giveStacksOrDrop(Player player, ItemStack... stacks) {
-        ItemStack[] cloneStacks = new ItemStack[stacks.length];
-        for (int i = 0; i < stacks.length; i++) {
-            cloneStacks[i] = stacks[i].clone();
+    public static boolean giveStacks(Player player, boolean dropNearbyIfNotFit, Iterable<ItemStack> stacks) {
+        List<ItemStack> stacksCopy = new ArrayList<ItemStack>();
+        for (ItemStack curStack : stacks) {
+            stacksCopy.add(curStack.clone());
         }
 
         Inventory inv = player.getInventory();
-        HashMap<Integer, ItemStack> ungiven = inv.addItem(cloneStacks);
-        boolean dropped = false;
-        if (ungiven != null && !ungiven.isEmpty()) {
-            dropped = true;
-            for (ItemStack ungivenStack : ungiven.values()) {
-                dropStackSafe(ungivenStack, player.getEyeLocation());
-            }
-        }
+        HashMap<Integer, ItemStack> ungiven = inv.addItem(stacksCopy.toArray(new ItemStack[stacksCopy.size()]));
         player.updateInventory();
-
-        return dropped;
+        if (ungiven != null && !ungiven.isEmpty()) {
+            if (dropNearbyIfNotFit) {
+                for (ItemStack ungivenStack : ungiven.values()) {
+                    dropStackSafe(ungivenStack, player.getEyeLocation());
+                }
+            }
+            return false;
+        }
+        return true;
     }
 }

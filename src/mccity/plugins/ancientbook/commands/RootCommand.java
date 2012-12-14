@@ -9,11 +9,7 @@ import org.bukkit.command.CommandSender;
 
 public class RootCommand {
 
-    private final AncientBookPlugin plugin;
-
-    public RootCommand(AncientBookPlugin plugin) {
-        this.plugin = plugin;
-    }
+    public RootCommand(AncientBookPlugin plugin) { }
 
     @Command(aliases = { "ancientbook", "abook" }, desc = "AncientBook main command")
     @CommandPermissions("ancientbook.command")

@@ -3,8 +3,8 @@ package mccity.plugins.ancientbook;
 import com.sk89q.minecraft.util.commands.ancientbook.*;
 import mccity.plugins.ancientbook.commands.AncientBookCommands;
 import mccity.plugins.ancientbook.commands.RootCommand;
-import me.galaran.bukkitutils.ancientbook.GUtils;
-import me.galaran.bukkitutils.ancientbook.Lang;
+import me.galaran.bukkitutils.ancientbook.text.Messaging;
+import me.galaran.bukkitutils.ancientbook.text.TranslationLang;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,15 +14,17 @@ import java.io.File;
 
 public class AncientBookPlugin extends JavaPlugin {
 
+    private TranslationLang lang;
+
     private CommandsManager<CommandSender> commands;
     private BooksManager booksManager;
 
     @Override
     public void onEnable() {
-        GUtils.init(getLogger(), "AncientBook");
+        lang = new TranslationLang(this, "english");
+        Messaging.init(getLogger(), ChatColor.GRAY + "[AncientBook] ", lang);
 
         booksManager = new BooksManager(getDataFolder());
-
         reloadSettings();
 
         commands = new CommandsManager<CommandSender>() {
@@ -35,21 +37,14 @@ public class AncientBookPlugin extends JavaPlugin {
         commands.register(RootCommand.class);
         commands.register(AncientBookCommands.class);
 
-        GUtils.log("AncientBook enabled");
+        Messaging.log("AncientBook enabled");
     }
 
     public boolean reloadSettings() {
         File configFile = new File(getDataFolder(), "config.yml");
         saveDefaultConfig();
-
-        try {
-            Settings.load(configFile);
-            Lang.initLang(Settings.lang, this);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-
+        Settings.load(configFile);
+        lang.reload(Settings.lang);
         return booksManager.reloadBooks();
     }
 
@@ -62,23 +57,22 @@ public class AncientBookPlugin extends JavaPlugin {
         try {
             commands.execute(command.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
-            GUtils.sendMessage(sender, ChatColor.RED + "You don't have permission.");
+            Messaging.send(sender, "utils.no-perm");
         } catch (MissingNestedCommandException e) {
-            GUtils.sendMessage(sender, ChatColor.RED + e.getUsage());
+            Messaging.sendRaw(sender, ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
-            GUtils.sendMessage(sender, ChatColor.RED + e.getMessage());
-            GUtils.sendMessage(sender, ChatColor.RED + e.getUsage());
+            Messaging.sendRaw(sender, ChatColor.RED + e.getMessage());
+            Messaging.sendRaw(sender, ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
             if (e.getCause() instanceof NumberFormatException) {
-                GUtils.sendMessage(sender, ChatColor.RED + "Number expected, string received instead.");
+                Messaging.send(sender, "command.not-a-number");
             } else {
-                GUtils.sendMessage(sender, ChatColor.RED + "An error has occurred. See console.");
+                Messaging.send(sender, "command.error-console");
                 e.printStackTrace();
             }
         } catch (CommandException e) {
-            GUtils.sendMessage(sender, ChatColor.RED + e.getMessage());
+            Messaging.sendRaw(sender, ChatColor.RED + e.getMessage());
         }
-
         return true;
     }
 }
