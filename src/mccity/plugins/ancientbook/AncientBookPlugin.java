@@ -8,6 +8,8 @@ import me.galaran.bukkitutils.ancientbook.text.TranslationLang;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -43,8 +45,9 @@ public class AncientBookPlugin extends JavaPlugin {
     public boolean reloadSettings() {
         File configFile = new File(getDataFolder(), "config.yml");
         saveDefaultConfig();
-        Settings.load(configFile);
-        lang.reload(Settings.lang);
+        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        lang.reload(config.getString("lang", "english"));
+        
         return booksManager.reloadBooks();
     }
 

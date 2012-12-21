@@ -1,4 +1,4 @@
-# AncientBook translation file
+# AncientBook lang file
 
 utils.no-player: &cИгрок с именем &3$1&c не найден
 utils.no-player-matching: &cИгрок с именем, начинающимся на &3$1&c не найден
@@ -16,7 +16,6 @@ add.not-a-book: &cВы должны держать в руке книгу
 add.no-author: &cУкажите автора или используйте подписанную книгу
 add.no-title: &cУкажите заголовок или используйте подписанную книгу
 add.illegal-params: &cНеверные параметры!
-add.data-too-low: &cПоле data книг должно быть не меньше &2$2&c, передано $1
 add.added: &2Книга &6$1&2 добавлена
 add.replaced: &2Книга &6$1&2 заменена
 
@@ -29,4 +28,4 @@ list.entry: &6$1&f: $2
 give.not-fit: &5У вас недостаточно места в инвентаре. Книга упала поблизости
 
 unsign.not-written-book: &cВы должны держать подписанную книгу
-unsign.success: &aКнига &5"$1"&a снова доступна для редактирования
+unsign.success: &aКнига снова доступна для редактирования

@@ -1,4 +1,4 @@
-# AncientBook translation file
+# AncientBook lang file
 
 utils.no-player: &cNo player with name &3$1
 utils.no-player-matching: &cNo player with name matching &3$1
@@ -16,7 +16,6 @@ add.not-a-book: &cYou must hold a written book to create book template
 add.no-author: &cPlease, specify author or use signed book
 add.no-title: &cPlease, specify title or use signed book
 add.illegal-params: &cIllegal parameters!
-add.data-too-low: &cBook data $1 is too low, min: &2$2&c for template books
 add.added: &2Book template &6$1&2 added
 add.replaced: &2Book template &6$1&2 replaced
 
@@ -29,4 +28,4 @@ list.entry: &6$1&f: $2
 give.not-fit: &5You do not have enough space in you inventory, so book has dropped nearby
 
 unsign.not-written-book: &cHold a written book to unsign it
-unsign.success: &aBook &5"$1"&a unsigned
+unsign.success: &aBook unsigned

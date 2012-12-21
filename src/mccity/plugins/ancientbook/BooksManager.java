@@ -1,42 +1,29 @@
 package mccity.plugins.ancientbook;
 
 import me.galaran.bukkitutils.ancientbook.IOUtils;
-import me.galaran.bukkitutils.ancientbook.nms.Book;
 import me.galaran.bukkitutils.ancientbook.text.Messaging;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.meta.BookMeta;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class BooksManager {
 
     private final File booksFile;
 
-    private final Map<Short, Book> bookTemplates = new TreeMap<Short, Book>();
+    private final Map<Short, BookMeta> books = new TreeMap<Short, BookMeta>();
 
     public BooksManager(File dataDir) {
         booksFile = new File(dataDir, "books.yml");
     }
 
-    public void addBook(short data, Book book, CommandSender sender) {
-        if (data < Settings.minData) {
-            Messaging.send(sender, "add.data-too-low", data, Settings.minData);
-            return;
-        }
-
-        // fix encoding
-        book.setAuthor(Settings.fixEncoding(book.getAuthor()));
-        book.setTitle(Settings.fixEncoding(book.getTitle()));
-        String[] pages = book.getPages();
-        for (int i = 0; i < pages.length; i++) {
-            pages[i] = Settings.fixEncoding(pages[i]);
-        }
-
-        if (bookTemplates.put(data, book) != null) {
+    public void addBook(short data, BookMeta book, CommandSender sender) {
+        if (books.put(data, book) != null) {
             Messaging.send(sender, "add.replaced", data);
         } else {
             Messaging.send(sender, "add.added", data);
@@ -45,7 +32,7 @@ public class BooksManager {
     }
 
     public void removeBook(short data, CommandSender sender) {
-        Book removed = bookTemplates.remove(data);
+        BookMeta removed = books.remove(data);
         if (removed != null) {
             Messaging.send(sender, "remove.ok", removed.getTitle(), data);
             saveBooks();
@@ -54,37 +41,53 @@ public class BooksManager {
         }
     }
 
-    public Book getBook(short data) {
-        return bookTemplates.get(data);
+    public BookMeta getBook(short data) {
+        return books.get(data);
     }
 
-    public Map<Short, Book> getMapping() {
-        return Collections.unmodifiableMap(bookTemplates);
+    public Map<Short, BookMeta> getMapping() {
+        return Collections.unmodifiableMap(books);
     }
 
     private void saveBooks() {
         YamlConfiguration root = new YamlConfiguration();
-        for (Map.Entry<Short, Book> entry : bookTemplates.entrySet()) {
-            root.set(String.valueOf(entry.getKey()), entry.getValue().serialize());
+        for (Map.Entry<Short, BookMeta> entry : books.entrySet()) {
+            root.set(String.valueOf(entry.getKey()), serializeBookMeta(entry.getValue()));
         }
         IOUtils.saveYml(root, booksFile);
     }
 
     public boolean reloadBooks() {
-        bookTemplates.clear();
+        books.clear();
 
         IOUtils.createFileIfNotExists(booksFile);
         YamlConfiguration root = YamlConfiguration.loadConfiguration(booksFile);
         try {
             Set<String> keys = root.getKeys(false);
             for (String key : keys) {
-                bookTemplates.put(Short.parseShort(key), new Book(root.getConfigurationSection(key)));
+                books.put(Short.parseShort(key), deserializeBookMeta(root.getConfigurationSection(key)));
             }
-            Messaging.log(bookTemplates.size() + " book templates loaded");
+            Messaging.log(books.size() + " book templates loaded");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
+    }
+
+    private Map<String, Object> serializeBookMeta(BookMeta meta) {
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("title", meta.getTitle());
+        map.put("author", meta.getAuthor());
+        map.put("pages", meta.getPages());
+        return map;
+    }
+
+    private BookMeta deserializeBookMeta(ConfigurationSection section) {
+        BookMeta result = (BookMeta) Bukkit.getItemFactory().getItemMeta(Material.WRITTEN_BOOK);
+        result.setTitle(section.getString("title"));
+        result.setAuthor(section.getString("author"));
+        result.setPages(section.getStringList("pages"));
+        return result;
     }
 }

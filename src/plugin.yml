@@ -1,7 +1,7 @@
 name: AncientBook
 main: mccity.plugins.ancientbook.AncientBookPlugin
-version: 1.6
-description: Predefined books manager
+version: 1.7
+description: Simple book manager
 author: Galaran
 
 commands:

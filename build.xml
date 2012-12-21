@@ -24,11 +24,10 @@
                 <include name="text/StringUtils.java"/>
                 <include name="text/TranslationBase.java"/>
                 <include name="text/TranslationLang.java"/>
+                <include name="text/McEncoding.java"/>
 
                 <include name="IOUtils.java"/>
-
-                <include name="nms/Book.java"/>
-                <include name="nms/NmsUtils.java"/>
+                <include name="ItemUtils.java"/>
             </fileset>
         </copy>
         <replace dir="src/${utils.package}/${utils.suffix}" token="${utils.placeholder}" value="${utils.suffix}"/>

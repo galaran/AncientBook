@@ -5,14 +5,16 @@ import com.sk89q.minecraft.util.commands.ancientbook.Command;
 import com.sk89q.minecraft.util.commands.ancientbook.CommandContext;
 import com.sk89q.minecraft.util.commands.ancientbook.CommandPermissions;
 import mccity.plugins.ancientbook.AncientBookPlugin;
-import me.galaran.bukkitutils.ancientbook.nms.Book;
-import me.galaran.bukkitutils.ancientbook.nms.NmsUtils;
+import me.galaran.bukkitutils.ancientbook.ItemUtils;
+import me.galaran.bukkitutils.ancientbook.text.McEncoding;
 import me.galaran.bukkitutils.ancientbook.text.Messaging;
 import me.galaran.bukkitutils.ancientbook.text.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.ChatPaginator;
 
 import java.util.Map;
@@ -35,6 +37,7 @@ public class AncientBookCommands {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Command(aliases = { "unsign" }, desc = "Unsign written book in the hand", min = 0, max = 0)
     @CommandPermissions("ancientbook.command")
     public void unsignHandBook(CommandContext args, CommandSender sender) {
@@ -43,9 +46,9 @@ public class AncientBookCommands {
 
         ItemStack handStack = player.getItemInHand();
         if (handStack != null && handStack.getType() == Material.WRITTEN_BOOK) {
-            Book book = new Book(handStack);
-            player.setItemInHand(book.toUnsignedBook());
-            Messaging.send(player, "unsign.success", book.getTitle());
+            handStack.setType(Material.BOOK_AND_QUILL);
+            player.updateInventory();
+            Messaging.send(player, "unsign.success");
         } else {
             Messaging.send(player, "unsign.not-written-book");
         }
@@ -58,25 +61,19 @@ public class AncientBookCommands {
         if (!Messaging.isPlayer(sender)) return;
         Player player = (Player) sender;
 
-        String author = null;
-        String title = null;
-        String[] pages;
-        short data;
         ItemStack handStack = player.getItemInHand();
-        if (handStack != null && handStack.getType() == Material.BOOK_AND_QUILL) {
-            data = handStack.getDurability();
-            Book book = new Book(handStack);
-            pages = book.getPages();
-        } else if (handStack != null && handStack.getType() == Material.WRITTEN_BOOK) {
-            data = handStack.getDurability();
-            Book book = new Book(handStack);
-            pages = book.getPages();
-            author = book.getAuthor();
-            title = book.getTitle();
-        } else {
+        if (handStack == null || !handStack.hasItemMeta()) {
             Messaging.send(sender, "add.not-a-book");
             return;
         }
+        ItemMeta meta = handStack.getItemMeta();
+        if (!(meta instanceof BookMeta)) {
+            Messaging.send(sender, "add.not-a-book");
+            return;
+        }
+
+        BookMeta book = (BookMeta) meta;
+        short data = handStack.getDurability();
 
         try {
             Map<String, String> params = StringUtils.parseParameters(args.getSlice(1));
@@ -84,25 +81,26 @@ public class AncientBookCommands {
                 data = Short.parseShort(params.get("d"));
             }
             if (params.containsKey("a")) {
-                author = StringUtils.colorizeAmps(params.get("a"));
+                book.setAuthor(StringUtils.colorizeAmps(params.get("a")));
             }
             if (params.containsKey("t")) {
-                title = StringUtils.colorizeAmps(params.get("t"));
+                book.setTitle(StringUtils.colorizeAmps(params.get("t")));
             }
         } catch (IllegalArgumentException ex) {
             Messaging.send(sender, "add.illegal-params");
             return;
         }
 
-        if (author == null) {
+        if (!book.hasAuthor()) {
             Messaging.send(sender, "add.no-author");
             return;
-        } else if (title == null) {
+        } else if (!book.hasTitle()) {
             Messaging.send(sender, "add.no-title");
             return;
         }
 
-        plugin.getBooksManager().addBook(data, new Book(title, author, pages), sender);
+        McEncoding.fixItemMeta(book);
+        plugin.getBooksManager().addBook(data, book, sender);
     }
 
     @Command(aliases = { "remove", "rm" }, desc = "Remove book with given data",
@@ -116,9 +114,9 @@ public class AncientBookCommands {
     @Command(aliases = { "list" }, desc = "Book templates list", min = 0, max = 0)
     @CommandPermissions("ancientbook.command")
     public void listBooks(CommandContext args, CommandSender sender) {
-        Map<Short, Book> mapping = plugin.getBooksManager().getMapping();
+        Map<Short, BookMeta> mapping = plugin.getBooksManager().getMapping();
         Messaging.send(sender, "list.header", mapping.size());
-        for (Map.Entry<Short, Book> entry : mapping.entrySet()) {
+        for (Map.Entry<Short, BookMeta> entry : mapping.entrySet()) {
             String title = entry.getValue().getTitle();
             int maxLength = ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH - 10;
             String shortedTitle = title.length() > maxLength ? title.substring(0, maxLength) + "..." : title;
@@ -131,8 +129,8 @@ public class AncientBookCommands {
     @CommandPermissions("ancientbook.command")
     public void giveBook(CommandContext args, CommandSender sender) {
         short data = (short) args.getInteger(0);
-        Book book = plugin.getBooksManager().getBook(data);
-        if (book == null) {
+        BookMeta bookMeta = plugin.getBooksManager().getBook(data);
+        if (bookMeta == null) {
             Messaging.send(sender, "book.no-such", data);
             return;
         }
@@ -144,11 +142,13 @@ public class AncientBookCommands {
         if (args.argsLength() == 3) {
             isUnsigned = Boolean.parseBoolean(args.getString(2));
         }
-
-        ItemStack bookStack = isUnsigned ? book.toUnsignedBook() : book.toSignedBook();
+        
+        ItemStack bookStack = new ItemStack(isUnsigned ? Material.BOOK_AND_QUILL : Material.WRITTEN_BOOK);
         bookStack.setDurability(data);
-        if (!NmsUtils.giveStacks(target, true, ImmutableList.of(bookStack))) {
-            Messaging.send(target, "give.not-fit", book.getTitle());
+        bookStack.setItemMeta(bookMeta.clone());
+        
+        if (!ItemUtils.giveStacks(target, true, ImmutableList.of(bookStack))) {
+            Messaging.send(target, "give.not-fit", bookMeta.getTitle());
         }
     }
 }
